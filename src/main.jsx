@@ -37,7 +37,7 @@ import "./styles.css";
 
 const THEME_KEY = "wordvault.theme.v1";
 const ACCENT_KEY = "wordvault.accent.v1";
-const CATEGORIES = ["Work", "Daily", "Email", "Interview", "Other"];
+const CATEGORIES = ["Work", "Daily", "Email", "Interview", "Grammar", "Other"];
 const STATUSES = ["New", "Learning", "Mastered"];
 const ACCENTS = [
   { value: "en-US", label: "US" },

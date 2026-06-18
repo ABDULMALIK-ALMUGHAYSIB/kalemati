@@ -9,7 +9,7 @@ create table if not exists public.vocabulary_words (
   example_sentence text default '',
   when_to_use text default '',
   category text not null default 'Other'
-    check (category in ('Work', 'Daily', 'Email', 'Interview', 'Other')),
+    check (category in ('Work', 'Daily', 'Email', 'Interview', 'Grammar', 'Other')),
   status text not null default 'New'
     check (status in ('New', 'Learning', 'Mastered')),
   date_added timestamptz not null default now(),

@@ -4,7 +4,7 @@ import OpenAI from "openai";
 
 const app = express();
 const port = Number(process.env.PORT || 3001);
-const categories = ["Work", "Daily", "Email", "Interview", "Other"];
+const categories = ["Work", "Daily", "Email", "Interview", "Grammar", "Other"];
 
 app.use(express.json({ limit: "32kb" }));
 
@@ -36,7 +36,7 @@ Given one English or Arabic word/phrase, generate a vocabulary card with:
 3. Simple English meaning
 4. Natural example sentence in English
 5. When to use it
-6. Suggested category from: Work, Daily, Email, Interview, Other
+6. Suggested category from: Work, Daily, Email, Interview, Grammar, Other
 
 Rules:
 - If the input is Arabic, translate it to the most natural English word or phrase.
@@ -45,6 +45,7 @@ Rules:
 - Always fill arabicTranslation with Arabic text only.
 - Keep the meaning simple and beginner-friendly.
 - Make the example practical.
+- If the input is about English rules, sentence structure, or grammar words, choose Grammar.
 - If the word is useful for workplace or interviews, choose Work or Interview.
 - Return JSON only.`;
 
