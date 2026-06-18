@@ -1,7 +1,4 @@
-import { previousWords } from "./previousWords";
-
 export const STORAGE_KEY = "wordvault.entries.v1";
-const PREVIOUS_WORDS_IMPORT_KEY = "wordvault.previousWordsImported.v1";
 const SUPABASE_MIGRATION_KEY = "kalemati.supabaseMigration.v1";
 
 function safeJsonParse(value, fallback) {
@@ -24,18 +21,9 @@ function uniqueByEnglish(entries) {
 
 export function loadLegacyEntries() {
   const storedEntries = safeJsonParse(localStorage.getItem(STORAGE_KEY), []);
-  const shouldIncludePreviousWords =
-    localStorage.getItem(PREVIOUS_WORDS_IMPORT_KEY) !== "true";
   const importDate = new Date().toISOString();
-  const previousEntries = shouldIncludePreviousWords
-    ? previousWords.map((word) => ({
-        ...word,
-        id: crypto.randomUUID(),
-        dateAdded: importDate
-      }))
-    : [];
 
-  return uniqueByEnglish([...storedEntries, ...previousEntries]).map((entry) => ({
+  return uniqueByEnglish(storedEntries).map((entry) => ({
     ...entry,
     id: entry.id || crypto.randomUUID(),
     dateAdded: entry.dateAdded || importDate
