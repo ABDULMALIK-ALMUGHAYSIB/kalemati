@@ -1014,7 +1014,7 @@ function ConfirmDeleteModal({ entry, onCancel, onConfirm }) {
       <div className="modal-card confirm-card">
         <div className="modal-header">
           <h2>Delete word?</h2>
-          <button className="icon-button" type="button" onClick={onCancel} title="Close">
+          <button className="modal-close-button" type="button" onClick={onCancel} title="Close">
             <X size={20} />
           </button>
         </div>
@@ -1290,7 +1290,7 @@ function EditModal({ entry, onSave, onCancel, onDelete }) {
       <div className="modal-card">
         <div className="modal-header">
           <h2>Edit word</h2>
-          <button className="icon-button" type="button" onClick={onCancel} title="Close">
+          <button className="modal-close-button" type="button" onClick={onCancel} title="Close">
             <X size={20} />
           </button>
         </div>
