@@ -62,6 +62,19 @@ const lessons = [
     title: "Do, Does, Did, Don't, Doesn't, Didn't",
     description: "Learn how to ask questions and make negative sentences in English.",
     category: "Grammar",
+    duration: "6 min",
+    level: "Beginner",
+    tips: [
+      "Use Are, Is, and Am for descriptions, feelings, and situations.",
+      "Use Do and Does for present actions.",
+      "Use Did for past actions, but keep the verb in base form.",
+      "Use Don't, Doesn't, and Didn't when the sentence is negative."
+    ],
+    commonMistakes: [
+      { wrong: "Did he worked?", correct: "Did he work?" },
+      { wrong: "Does he works?", correct: "Does he work?" },
+      { wrong: "He don't know.", correct: "He doesn't know." }
+    ],
     sections: [
       {
         title: "1. Are / Is / Am",
@@ -1320,14 +1333,68 @@ function QuizPage({ accent, entries }) {
 }
 
 function LessonsPage() {
-  const lesson = lessons[0];
+  const [selectedLessonId, setSelectedLessonId] = useState(null);
+  const selectedLesson = lessons.find((lesson) => lesson.id === selectedLessonId);
+
+  if (selectedLesson) {
+    return (
+      <LessonDetails
+        lesson={selectedLesson}
+        onBack={() => setSelectedLessonId(null)}
+      />
+    );
+  }
 
   return (
     <section className="page-stack lessons-page">
+      <div className="lesson-list">
+        {lessons.map((lesson) => (
+          <button
+            className="lesson-card"
+            key={lesson.id}
+            type="button"
+            onClick={() => setSelectedLessonId(lesson.id)}
+          >
+            <span>{lesson.category}</span>
+            <h2>{lesson.title}</h2>
+            <p>{lesson.description}</p>
+            <div className="lesson-card-meta">
+              <strong>{lesson.level}</strong>
+              <strong>{lesson.duration}</strong>
+              <strong>{lesson.sections.length} sections</strong>
+            </div>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function LessonDetails({ lesson, onBack }) {
+  return (
+    <section className="page-stack lessons-page">
+      <button className="lesson-back-button" type="button" onClick={onBack}>
+        Back to lessons
+      </button>
+
       <article className="lesson-hero">
         <span>{lesson.category}</span>
         <h2>{lesson.title}</h2>
         <p>{lesson.description}</p>
+        <div className="lesson-card-meta">
+          <strong>{lesson.level}</strong>
+          <strong>{lesson.duration}</strong>
+          <strong>{lesson.sections.length} sections</strong>
+        </div>
+      </article>
+
+      <article className="lesson-summary">
+        <h3>Tips</h3>
+        <div>
+          {lesson.tips.map((tip) => (
+            <p key={tip}>{tip}</p>
+          ))}
+        </div>
       </article>
 
       <div className="lesson-section-list">
@@ -1353,6 +1420,18 @@ function LessonsPage() {
           </article>
         ))}
       </div>
+
+      <article className="lesson-summary">
+        <h3>Common Mistakes</h3>
+        <div className="lesson-pair">
+          {lesson.commonMistakes.map((mistake) => (
+            <React.Fragment key={mistake.wrong}>
+              <p><strong>Wrong</strong> {mistake.wrong}</p>
+              <p><strong>Correct</strong> {mistake.correct}</p>
+            </React.Fragment>
+          ))}
+        </div>
+      </article>
 
       <article className="lesson-summary">
         <h3>Quick Summary</h3>
