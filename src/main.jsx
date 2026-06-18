@@ -95,6 +95,10 @@ function saveAccent(accent) {
   localStorage.setItem(ACCENT_KEY, accent);
 }
 
+function containsArabic(value) {
+  return /[\u0600-\u06FF]/.test(value);
+}
+
 function StatCard({ label, value, tone }) {
   return (
     <article className={`stat-card ${tone}`}>
@@ -733,7 +737,7 @@ function AddWordPage({ accent, onSave }) {
     const word = form.english.trim();
 
     if (!word) {
-      setAiError("Type an English word or phrase first.");
+      setAiError("Type an English or Arabic word first.");
       setGenerated(false);
       return;
     }
@@ -760,8 +764,8 @@ function AddWordPage({ accent, onSave }) {
 
       setForm((current) => ({
         ...current,
-        english: word,
-        arabic: data.arabicTranslation || "",
+        english: data.englishWordOrPhrase || word,
+        arabic: data.arabicTranslation || (containsArabic(word) ? word : ""),
         meaning: data.simpleMeaning || "",
         example: data.exampleSentence || "",
         usage: data.whenToUse || "",
@@ -811,11 +815,12 @@ function AddWordPage({ accent, onSave }) {
       />
 
       <form className="word-form" onSubmit={handleSubmit}>
-        <Field label="English word or phrase">
+        <Field label="English or Arabic word / phrase">
           <TextInput
+            arabic={containsArabic(form.english)}
             value={form.english}
             onChange={(event) => updateField("english", event.target.value)}
-            placeholder="e.g. follow up"
+            placeholder="e.g. follow up / سمعة"
           />
         </Field>
 

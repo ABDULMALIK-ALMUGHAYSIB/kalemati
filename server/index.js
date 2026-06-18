@@ -12,6 +12,7 @@ const responseSchema = {
   type: "object",
   additionalProperties: false,
   properties: {
+    englishWordOrPhrase: { type: "string" },
     arabicTranslation: { type: "string" },
     simpleMeaning: { type: "string" },
     exampleSentence: { type: "string" },
@@ -19,6 +20,7 @@ const responseSchema = {
     category: { type: "string", enum: categories }
   },
   required: [
+    "englishWordOrPhrase",
     "arabicTranslation",
     "simpleMeaning",
     "exampleSentence",
@@ -28,14 +30,19 @@ const responseSchema = {
 };
 
 const systemPrompt = `You are an English vocabulary assistant for an Arabic speaker.
-Given one English word or phrase, generate:
-1. Arabic translation
-2. Simple English meaning
-3. Natural example sentence
-4. When to use it
-5. Suggested category from: Work, Daily, Email, Interview, Other
+Given one English or Arabic word/phrase, generate a vocabulary card with:
+1. English word or phrase
+2. Arabic translation
+3. Simple English meaning
+4. Natural example sentence in English
+5. When to use it
+6. Suggested category from: Work, Daily, Email, Interview, Other
 
 Rules:
+- If the input is Arabic, translate it to the most natural English word or phrase.
+- If the input is English, keep the English word or phrase natural and clean.
+- Always fill englishWordOrPhrase with English text only.
+- Always fill arabicTranslation with Arabic text only.
 - Keep the meaning simple and beginner-friendly.
 - Make the example practical.
 - If the word is useful for workplace or interviews, choose Work or Interview.
@@ -53,6 +60,7 @@ function getOpenAIClient() {
 
 app.post("/api/generate-word", async (req, res) => {
   const word = typeof req.body?.word === "string" ? req.body.word.trim() : "";
+  const inputLanguage = /[\u0600-\u06FF]/.test(word) ? "Arabic" : "English";
 
   if (!word) {
     return res.status(400).json({ error: "Word is required." });
@@ -71,7 +79,10 @@ app.post("/api/generate-word", async (req, res) => {
       temperature: 0.3,
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: `English word or phrase: ${word}` }
+        {
+          role: "user",
+          content: `Input language: ${inputLanguage}\nInput word or phrase: ${word}`
+        }
       ],
       response_format: {
         type: "json_schema",
@@ -87,6 +98,7 @@ app.post("/api/generate-word", async (req, res) => {
     const generated = JSON.parse(rawContent || "{}");
 
     return res.json({
+      englishWordOrPhrase: generated.englishWordOrPhrase,
       arabicTranslation: generated.arabicTranslation,
       simpleMeaning: generated.simpleMeaning,
       exampleSentence: generated.exampleSentence,
