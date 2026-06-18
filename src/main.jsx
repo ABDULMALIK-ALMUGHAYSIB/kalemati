@@ -171,7 +171,6 @@ function ThemeToggle({ theme, onToggle }) {
 function AccentSelector({ accent, onChange }) {
   return (
     <label className="accent-selector" title="Pronunciation accent">
-      <span>Accent</span>
       <select value={accent} onChange={(event) => onChange(event.target.value)}>
         {ACCENTS.map((option) => (
           <option key={option.value} value={option.value}>
@@ -434,7 +433,6 @@ function App() {
         accent={accent}
         entries={entries}
         onEdit={setEditingEntry}
-        onDelete={deleteEntry}
       />
     ),
     review: (
@@ -524,6 +522,10 @@ function App() {
           entry={editingEntry}
           onCancel={() => setEditingEntry(null)}
           onSave={saveEdit}
+          onDelete={async () => {
+            await deleteEntry(editingEntry.id);
+            setEditingEntry(null);
+          }}
         />
       ) : null}
     </div>
@@ -905,11 +907,10 @@ function AddWordPage({ accent, onSave }) {
   );
 }
 
-function VocabularyList({ accent, entries, onEdit, onDelete }) {
+function VocabularyList({ accent, entries, onEdit }) {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [status, setStatus] = useState("All");
-  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const filteredEntries = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -958,7 +959,6 @@ function VocabularyList({ accent, entries, onEdit, onDelete }) {
               accent={accent}
               entry={entry}
               onEdit={() => onEdit(entry)}
-              onDelete={() => setDeleteTarget(entry)}
             />
           ))
         ) : (
@@ -970,25 +970,11 @@ function VocabularyList({ accent, entries, onEdit, onDelete }) {
         )}
       </div>
 
-      {deleteTarget ? (
-        <ConfirmDeleteModal
-          entry={deleteTarget}
-          onCancel={() => setDeleteTarget(null)}
-          onConfirm={async () => {
-            try {
-              await onDelete(deleteTarget.id);
-              setDeleteTarget(null);
-            } catch {
-              // The app-level sync error explains the failure.
-            }
-          }}
-        />
-      ) : null}
     </section>
   );
 }
 
-function WordCard({ accent, entry, onEdit, onDelete }) {
+function WordCard({ accent, entry, onEdit }) {
   return (
     <article className="word-card">
       <div className="word-card-header">
@@ -999,7 +985,6 @@ function WordCard({ accent, entry, onEdit, onDelete }) {
           </div>
           <p className="word-translation" dir="rtl" lang="ar">{entry.arabic}</p>
         </div>
-        <span className={`status-pill ${entry.status.toLowerCase()}`}>{entry.status}</span>
       </div>
 
       {entry.example ? <p className="example">"{entry.example}"</p> : null}
@@ -1015,10 +1000,6 @@ function WordCard({ accent, entry, onEdit, onDelete }) {
         <button type="button" onClick={onEdit}>
           <Edit3 size={17} />
           Edit
-        </button>
-        <button className="danger-button" type="button" onClick={onDelete}>
-          <Trash2 size={17} />
-          Delete
         </button>
       </div>
     </article>
@@ -1270,7 +1251,7 @@ function QuizPage({ accent, entries }) {
   );
 }
 
-function EditModal({ entry, onSave, onCancel }) {
+function EditModal({ entry, onSave, onCancel, onDelete }) {
   const [form, setForm] = useState({
     english: entry.english,
     arabic: entry.arabic,
@@ -1282,6 +1263,7 @@ function EditModal({ entry, onSave, onCancel }) {
   });
   const [saveLoading, setSaveLoading] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -1345,12 +1327,36 @@ function EditModal({ entry, onSave, onCancel }) {
           </div>
           {saveError ? <p className="error-note" role="alert">{saveError}</p> : null}
 
-          <button className="primary-button" type="submit" disabled={saveLoading}>
-            {saveLoading ? <LoaderCircle className="spin" size={18} /> : <Save size={18} />}
-            {saveLoading ? "Saving..." : "Save Changes"}
-          </button>
+          <div className="modal-action-row">
+            <button className="primary-button" type="submit" disabled={saveLoading}>
+              {saveLoading ? <LoaderCircle className="spin" size={18} /> : <Save size={18} />}
+              {saveLoading ? "Saving..." : "Save Changes"}
+            </button>
+            <button
+              className="danger-button"
+              type="button"
+              onClick={() => setDeleteTarget(entry)}
+            >
+              <Trash2 size={17} />
+              Delete
+            </button>
+          </div>
         </form>
       </div>
+
+      {deleteTarget ? (
+        <ConfirmDeleteModal
+          entry={deleteTarget}
+          onCancel={() => setDeleteTarget(null)}
+          onConfirm={async () => {
+            try {
+              await onDelete();
+            } catch (error) {
+              setSaveError(error.message || "Could not delete this word.");
+            }
+          }}
+        />
+      ) : null}
     </div>
   );
 }

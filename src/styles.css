@@ -131,7 +131,7 @@ select {
 
 .brand-name {
   color: var(--text);
-  font-size: clamp(1.42rem, 8vw, 2.15rem);
+  font-size: clamp(1.18rem, 6vw, 1.55rem);
   font-weight: 950;
   line-height: 1;
 }
@@ -644,7 +644,8 @@ textarea:focus {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 12px;
+  margin-top: auto;
+  padding-top: 12px;
   color: var(--text-muted);
   font-size: 0.83rem;
   font-weight: 800;
@@ -658,10 +659,10 @@ textarea:focus {
 
 .card-actions {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 9px;
-  margin-top: auto;
-  padding-top: 13px;
+  margin-top: 10px;
+  padding-top: 0;
 }
 
 .danger-button {
@@ -805,9 +806,8 @@ textarea:focus {
   border-radius: 8px;
   display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  padding: 0 8px;
+  justify-content: center;
+  padding: 0 6px;
   background: var(--surface);
   color: var(--text);
   font-weight: 850;
@@ -819,13 +819,14 @@ textarea:focus {
 }
 
 .accent-selector select {
-  width: auto;
-  min-width: 54px;
+  width: 100%;
+  min-width: 0;
   min-height: 34px;
   border: 0;
-  padding: 0 18px 0 4px;
+  padding: 0 18px 0 8px;
   background: transparent;
   color: var(--text);
+  text-align: center;
   font-weight: 900;
 }
 
@@ -904,6 +905,23 @@ textarea:focus {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
+}
+
+.modal-action-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.modal-action-row button {
+  min-height: 48px;
+  border: 0;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 850;
 }
 
 .confirm-card {
@@ -985,6 +1003,10 @@ button:disabled {
   .modal-backdrop {
     align-items: center;
   }
+
+  .modal-action-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (min-width: 900px) {
@@ -1004,5 +1026,9 @@ button:disabled {
 
   .theme-toggle {
     min-width: 112px;
+  }
+
+  .brand-name {
+    font-size: 2rem;
   }
 }
