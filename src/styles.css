@@ -726,6 +726,113 @@ textarea:focus {
   padding: 14px;
 }
 
+.lesson-hero,
+.lesson-section,
+.lesson-summary {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.lesson-hero {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+}
+
+.lesson-hero span,
+.lesson-rule {
+  color: var(--primary);
+  font-weight: 900;
+}
+
+.lesson-hero h2,
+.lesson-hero p,
+.lesson-section h3,
+.lesson-section p,
+.lesson-summary h3,
+.lesson-summary p {
+  margin: 0;
+}
+
+.lesson-hero h2 {
+  font-size: clamp(1.45rem, 8vw, 2.2rem);
+  line-height: 1.08;
+}
+
+.lesson-hero p,
+.lesson-section p,
+.lesson-summary p {
+  color: var(--text-soft);
+  line-height: 1.55;
+}
+
+.lesson-section-list {
+  display: grid;
+  gap: 12px;
+}
+
+.lesson-section,
+.lesson-summary {
+  display: grid;
+  gap: 12px;
+  padding: 15px;
+}
+
+.lesson-section h3,
+.lesson-summary h3 {
+  font-size: 1.08rem;
+}
+
+.lesson-examples {
+  display: grid;
+  gap: 7px;
+}
+
+.lesson-examples span,
+.lesson-summary p {
+  padding: 10px 11px;
+  border-radius: 8px;
+  background: var(--surface-muted);
+  color: var(--text);
+  font-weight: 800;
+}
+
+.lesson-summary > div {
+  display: grid;
+  gap: 8px;
+}
+
+.lesson-summary p {
+  display: grid;
+  gap: 4px;
+}
+
+.lesson-summary p span {
+  color: var(--text-soft);
+  font-size: 0.8rem;
+}
+
+.lesson-pair {
+  display: grid;
+  gap: 8px;
+}
+
+.lesson-pair p {
+  padding: 10px 11px;
+  border-radius: 8px;
+  background: var(--surface-muted);
+  color: var(--text);
+  font-weight: 800;
+}
+
+.lesson-pair strong {
+  display: inline-block;
+  min-width: 62px;
+  color: var(--primary);
+}
+
 .empty-state {
   display: grid;
   place-items: center;
@@ -854,7 +961,7 @@ textarea:focus {
   left: 0;
   z-index: 8;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 2px;
   width: min(100%, 860px);
   margin: 0 auto;
@@ -875,7 +982,7 @@ textarea:focus {
   gap: 3px;
   background: transparent;
   color: var(--text-soft);
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   font-weight: 850;
 }
 

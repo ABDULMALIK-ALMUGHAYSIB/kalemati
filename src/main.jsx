@@ -56,6 +56,65 @@ const emptyForm = {
   category: "Daily",
   status: "New"
 };
+const lessons = [
+  {
+    id: "do-does-did-negatives",
+    title: "Do, Does, Did, Don't, Doesn't, Didn't",
+    description: "Learn how to ask questions and make negative sentences in English.",
+    category: "Grammar",
+    sections: [
+      {
+        title: "1. Are / Is / Am",
+        body: "Use Are, Is, and Am to describe a person, thing, or situation.",
+        examples: ["Are you tired?", "Are you busy?", "Is he happy?", "Am I late?"],
+        rule: "Use Are, Is, or Am when talking about a state, feeling, condition, or description."
+      },
+      {
+        title: "2. Do / Does",
+        body: "Use Do and Does to ask about actions in the present.",
+        examples: ["Do you work here?", "Do you play football?", "Does he work here?", "Does she drive?"],
+        rule: "Do = I, You, We, They. Does = He, She, It."
+      },
+      {
+        title: "3. Did",
+        body: "Use Did to ask about actions in the past.",
+        examples: ["Did you call Ahmad?", "Did he work yesterday?", "Did she visit Riyadh?"],
+        rule: "After Did, always use the base form of the verb.",
+        correct: "Did he work?",
+        wrong: "Did he worked?"
+      },
+      {
+        title: "4. Don't",
+        body: "Don't = Do Not",
+        examples: ["I don't know.", "We don't have access.", "They don't like coffee."],
+        rule: "Use Don't to make negative sentences in the present."
+      },
+      {
+        title: "5. Doesn't",
+        body: "Doesn't = Does Not",
+        examples: ["He doesn't know.", "She doesn't work here.", "It doesn't matter."],
+        rule: "Use Doesn't with He, She, and It."
+      },
+      {
+        title: "6. Didn't",
+        body: "Didn't = Did Not",
+        examples: ["I didn't go.", "He didn't call me.", "They didn't arrive."],
+        rule: "Use Didn't to make negative sentences in the past."
+      }
+    ],
+    summary: [
+      ["State or description?", "Are / Is / Am"],
+      ["Present action?", "Do / Does"],
+      ["Past action?", "Did"],
+      ["Present negative?", "Don't / Doesn't"],
+      ["Past negative?", "Didn't"]
+    ],
+    goldenRules: [
+      { correct: "Did she go?", wrong: "Did she went?" },
+      { correct: "Does he work?", wrong: "Does he works?" }
+    ]
+  }
+];
 
 function todayKey(date = new Date()) {
   return date.toISOString().slice(0, 10);
@@ -446,7 +505,8 @@ function App() {
         onUpdate={updateEntry}
       />
     ),
-    quiz: <QuizPage accent={accent} entries={entries} />
+    quiz: <QuizPage accent={accent} entries={entries} />,
+    lessons: <LessonsPage />
   };
 
   if (authLoading) {
@@ -670,7 +730,8 @@ function pageTitle(page) {
     add: "Add Word",
     list: "Vocabulary",
     review: "Review Today",
-    quiz: "Quiz"
+    quiz: "Quiz",
+    lessons: "Lessons"
   }[page];
 }
 
@@ -1258,6 +1319,71 @@ function QuizPage({ accent, entries }) {
   );
 }
 
+function LessonsPage() {
+  const lesson = lessons[0];
+
+  return (
+    <section className="page-stack lessons-page">
+      <article className="lesson-hero">
+        <span>{lesson.category}</span>
+        <h2>{lesson.title}</h2>
+        <p>{lesson.description}</p>
+      </article>
+
+      <div className="lesson-section-list">
+        {lesson.sections.map((section) => (
+          <article className="lesson-section" key={section.title}>
+            <h3>{section.title}</h3>
+            <p>{section.body}</p>
+
+            <div className="lesson-examples">
+              {section.examples.map((example) => (
+                <span key={example}>{example}</span>
+              ))}
+            </div>
+
+            <p className="lesson-rule">{section.rule}</p>
+
+            {section.correct && section.wrong ? (
+              <div className="lesson-pair">
+                <p><strong>Correct</strong> {section.correct}</p>
+                <p><strong>Wrong</strong> {section.wrong}</p>
+              </div>
+            ) : null}
+          </article>
+        ))}
+      </div>
+
+      <article className="lesson-summary">
+        <h3>Quick Summary</h3>
+        <div>
+          {lesson.summary.map(([question, answer]) => (
+            <p key={question}>
+              <span>{question}</span>
+              <strong>{answer}</strong>
+            </p>
+          ))}
+        </div>
+      </article>
+
+      <article className="lesson-summary">
+        <h3>Golden Rule</h3>
+        <p className="lesson-rule">
+          After Do, Does, Did, Don't, Doesn't, and Didn't, use the base form of the verb.
+        </p>
+        <div className="lesson-pair">
+          {lesson.goldenRules.map((rule) => (
+            <React.Fragment key={rule.correct}>
+              <p><strong>Correct</strong> {rule.correct}</p>
+              <p><strong>Wrong</strong> {rule.wrong}</p>
+            </React.Fragment>
+          ))}
+        </div>
+      </article>
+    </section>
+  );
+}
+
 function EditModal({ entry, onSave, onCancel, onDelete }) {
   const [form, setForm] = useState({
     english: entry.english,
@@ -1374,7 +1500,8 @@ function Navigation({ activePage, onNavigate }) {
     { id: "add", label: "Add", icon: Plus },
     { id: "list", label: "Words", icon: Library },
     { id: "review", label: "Review", icon: BookOpen },
-    { id: "quiz", label: "Quiz", icon: Brain }
+    { id: "quiz", label: "Quiz", icon: Brain },
+    { id: "lessons", label: "Lessons", icon: ClipboardList }
   ];
 
   return (
