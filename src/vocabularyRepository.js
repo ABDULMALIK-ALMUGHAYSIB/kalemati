@@ -50,6 +50,21 @@ function sortNewestFirst(entries) {
   return entries.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
 }
 
+function normalizeEnglish(value) {
+  return value.trim().toLowerCase();
+}
+
+function dedupeNewestByEnglish(entries) {
+  const seen = new Set();
+
+  return sortNewestFirst(entries).filter((entry) => {
+    const key = normalizeEnglish(entry.english);
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 export async function fetchWords() {
   const { data, error } = await supabase
     .from(TABLE_NAME)
@@ -57,7 +72,48 @@ export async function fetchWords() {
     .order("date_added", { ascending: false });
 
   if (error) throw error;
-  return (data || []).map(fromRow);
+  return dedupeNewestByEnglish((data || []).map(fromRow));
+}
+
+export async function cleanupDuplicateWords() {
+  const { data, error } = await supabase
+    .from(TABLE_NAME)
+    .select("*")
+    .order("date_added", { ascending: false });
+
+  if (error) throw error;
+
+  const entries = (data || []).map(fromRow);
+  const seen = new Set();
+  const duplicateIds = [];
+  const uniqueEntries = [];
+
+  for (const entry of sortNewestFirst(entries)) {
+    const key = normalizeEnglish(entry.english);
+
+    if (!key) continue;
+
+    if (seen.has(key)) {
+      duplicateIds.push(entry.id);
+    } else {
+      seen.add(key);
+      uniqueEntries.push(entry);
+    }
+  }
+
+  if (duplicateIds.length) {
+    const { error: deleteError } = await supabase
+      .from(TABLE_NAME)
+      .delete()
+      .in("id", duplicateIds);
+
+    if (deleteError) throw deleteError;
+  }
+
+  return {
+    entries: uniqueEntries,
+    removed: duplicateIds.length
+  };
 }
 
 export async function createWord(entry, userId) {

@@ -20,6 +20,7 @@ import {
   X
 } from "lucide-react";
 import {
+  cleanupDuplicateWords,
   createWord,
   deleteWord,
   fetchWords,
@@ -240,6 +241,7 @@ function App() {
   const [authLoading, setAuthLoading] = useState(isSupabaseConfigured);
   const [entriesLoading, setEntriesLoading] = useState(false);
   const [syncError, setSyncError] = useState("");
+  const [syncNotice, setSyncNotice] = useState("");
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -273,6 +275,7 @@ function App() {
       setEditingEntry(null);
       setActivePage("dashboard");
       setSyncError("");
+      setSyncNotice("");
     });
 
     return () => {
@@ -290,6 +293,7 @@ function App() {
     async function loadAndSyncEntries() {
       setEntriesLoading(true);
       setSyncError("");
+      setSyncNotice("");
 
       try {
         if (!hasMigratedLegacyEntries(userId)) {
@@ -300,8 +304,13 @@ function App() {
           markLegacyEntriesMigrated(userId);
         }
 
-        const words = await fetchWords();
-        if (isMounted) setEntries(words);
+        const { entries: cleanedWords, removed } = await cleanupDuplicateWords();
+        if (isMounted) {
+          setEntries(cleanedWords);
+          if (removed) {
+            setSyncNotice(`Removed ${removed} duplicated words.`);
+          }
+        }
       } catch (error) {
         if (isMounted) {
           setSyncError(error.message || "Could not sync your vocabulary.");
@@ -345,6 +354,16 @@ function App() {
   async function addEntry(data) {
     if (!session?.user?.id) {
       throw new Error("Please sign in before saving words.");
+    }
+
+    const existingEntry = entries.find(
+      (entry) => entry.english.trim().toLowerCase() === data.english.trim().toLowerCase()
+    );
+
+    if (existingEntry) {
+      await updateEntry(existingEntry.id, data);
+      setActivePage("list");
+      return;
     }
 
     const entry = {
@@ -494,6 +513,7 @@ function App() {
 
       <main>
         {syncError ? <p className="error-note sync-note" role="alert">{syncError}</p> : null}
+        {syncNotice ? <p className="success-note sync-note" role="status">{syncNotice}</p> : null}
         {entriesLoading ? <LoadingState text="Syncing your words..." /> : pages[activePage]}
       </main>
 
