@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Kalemati notebook icon</title>
+  <desc id="desc">A flat dark navy vocabulary notebook with a purple spine, bookmark, and white letter K.</desc>
+  <rect width="512" height="512" rx="112" fill="#F8F7FC"/>
+  <path d="M154 58h248c15 0 27 12 27 27v76h-34v-49H154c-23 0-42 18-42 41s19 41 42 41h42v330h-42c-58 0-105-47-105-105V163C49 105 96 58 154 58Z" fill="#111827"/>
+  <path d="M154 194h246c35 0 63 28 63 63v185c0 35-28 63-63 63H154c-58 0-105-47-105-105V153c0 23 19 41 42 41h63Z" fill="#111827"/>
+  <path d="M49 153c0 23 19 41 42 41h63v311h-5c-55 0-100-45-100-100V153Z" fill="#6D3DE8"/>
+  <path d="M158 454h254c23 0 43-16 48-38v25c0 35-28 63-63 63H158v-50Z" fill="#F8F7FC"/>
+  <path d="M196 455h67v82l-34-27-33 27v-82Z" fill="#6D3DE8"/>
+  <path d="M244 239c0-8 6-14 14-14h32c8 0 14 6 14 14v90l82-97c4-5 9-7 15-7h42c11 0 17 13 10 22l-92 105 96 118c7 9 1 22-10 22h-43c-5 0-10-2-13-7l-87-108v101c0 8-6 14-14 14h-32c-8 0-14-6-14-14V239Z" fill="#FFFFFF"/>
+</svg>

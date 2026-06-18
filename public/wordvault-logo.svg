@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">WordVault logo</title>
+  <desc id="desc">Flat vector logo showing a modern vocabulary notebook, a bookmark, and the letter K in purple and dark navy.</desc>
+  <rect width="512" height="512" rx="112" fill="#0B1324"/>
+  <path d="M150 104h238c20 0 36 16 36 36v254c0 20-16 36-36 36H150c-34 0-62-28-62-62V166c0-34 28-62 62-62Z" fill="#F7F4FF"/>
+  <path d="M154 132h224c9 0 16 7 16 16v220c0 9-7 16-16 16H154c-18 0-32-14-32-32V164c0-18 14-32 32-32Z" fill="#111A2E"/>
+  <path d="M122 164c0-18 14-32 32-32h44v252h-44c-18 0-32-14-32-32V164Z" fill="#6D3DE8"/>
+  <path d="M208 384h58v88l-29-24-29 24V384Z" fill="#7C4DFF"/>
+  <path d="M188 156h186v30H188c-18 0-32-12-32-30s14-30 32-30h186v30H188Z" fill="#F7F4FF"/>
+  <path d="M246 214c0-7 5-12 12-12h28c7 0 12 5 12 12v82l76-88c3-4 7-6 12-6h36c10 0 15 12 9 19l-83 94 86 108c6 8 1 19-9 19h-37c-4 0-8-2-11-5l-79-99v92c0 7-5 12-12 12h-28c-7 0-12-5-12-12V214Z" fill="#FFFFFF"/>
+  <path d="M104 360h304v34c0 9-7 16-16 16H150c-24 0-44-20-46-50Z" fill="#F7F4FF"/>
+  <path d="M122 360h244c-2 14-14 24-28 24H154c-18 0-32-10-32-24Z" fill="#111A2E"/>
+</svg>

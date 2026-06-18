@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 176" role="img" aria-labelledby="title desc">
+  <title id="title">Kalemati wordmark</title>
+  <desc id="desc">Kalemati brand wordmark with a purple K and dark navy letters.</desc>
+  <text x="0" y="110" fill="#6D3DE8" font-family="Inter, Arial, sans-serif" font-size="118" font-weight="900">K</text>
+  <text x="95" y="110" fill="#111827" font-family="Inter, Arial, sans-serif" font-size="118" font-weight="900">alemati</text>
+  <rect x="0" y="154" width="54" height="4" fill="#6D3DE8"/>
+  <text x="76" y="163" fill="#6D3DE8" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="700" letter-spacing="12">BUILD YOUR ENGLISH VOCABULARY</text>
+  <rect x="820" y="154" width="54" height="4" fill="#6D3DE8"/>
+</svg>
