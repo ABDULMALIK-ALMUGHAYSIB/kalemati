@@ -750,7 +750,9 @@ function AddWordPage({ accent, onSave }) {
         body: JSON.stringify({ word })
       });
 
-      const data = await response.json().catch(() => ({}));
+      const data = await response.json().catch(() => ({
+        error: "AI endpoint is not returning JSON. Check the deployment API route."
+      }));
 
       if (!response.ok) {
         throw new Error(data.error || "AI generation failed. Please try again.");
