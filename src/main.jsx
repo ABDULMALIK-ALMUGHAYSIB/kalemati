@@ -461,7 +461,6 @@ function App() {
       <header className="topbar">
         <div className="brand-heading">
           <div className="brand-row">
-            <img className="brand-icon" src={LOGOS[theme]} alt="Kalemati" />
             <div>
               <p className="brand-name"><span>K</span>alemati</p>
             </div>
@@ -517,7 +516,6 @@ function AppFrame({ children, theme, setTheme }) {
       <header className="topbar">
         <div className="brand-heading">
           <div className="brand-row">
-            <img className="brand-icon" src={LOGOS[theme]} alt="Kalemati" />
             <div>
               <p className="brand-name"><span>K</span>alemati</p>
             </div>

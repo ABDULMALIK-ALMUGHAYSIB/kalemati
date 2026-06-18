@@ -56,6 +56,7 @@
 html {
   min-height: 100%;
   background: var(--bg);
+  overflow-x: hidden;
 }
 
 body {
@@ -64,6 +65,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
+  overflow-x: hidden;
 }
 
 button,
@@ -86,27 +88,27 @@ select {
   width: min(100%, 860px);
   min-height: 100vh;
   margin: 0 auto;
-  padding: 16px 14px 96px;
+  padding: 12px 14px 96px;
 }
 
 .topbar {
   position: sticky;
   top: 0;
   z-index: 5;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 0 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  padding: 8px 0 14px;
   background: var(--topbar-bg);
   backdrop-filter: blur(14px);
 }
 
 .topbar-actions {
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 46px 46px;
   gap: 8px;
-  flex-wrap: wrap;
-  justify-content: end;
+  align-items: stretch;
+  width: 100%;
 }
 
 .topbar h1 {
@@ -120,25 +122,16 @@ select {
 .brand-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
 }
 
-.brand-icon {
-  width: 48px;
-  height: 48px;
-  flex: 0 0 auto;
-  border-radius: 10px;
-  object-fit: cover;
-  object-position: center;
-}
 .brand-name {
   margin: 0;
 }
 
 .brand-name {
   color: var(--text);
-  font-size: clamp(1.16rem, 5vw, 1.72rem);
+  font-size: clamp(1.42rem, 8vw, 2.15rem);
   font-weight: 950;
   line-height: 1;
 }
@@ -149,7 +142,7 @@ select {
 
 .topbar h1 {
   color: var(--text-muted);
-  font-size: clamp(1.28rem, 6vw, 1.9rem);
+  font-size: clamp(1.7rem, 10vw, 2.65rem);
   line-height: 1.05;
   letter-spacing: 0;
 }
@@ -441,6 +434,7 @@ main {
 input,
 select,
 textarea {
+  font-size: 16px;
   width: 100%;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -751,7 +745,8 @@ textarea:focus {
 }
 
 .icon-button {
-  width: 46px;
+  width: 100%;
+  min-width: 46px;
   height: 46px;
   border: 0;
   border-radius: 8px;
@@ -781,6 +776,8 @@ textarea:focus {
 }
 
 .theme-toggle {
+  width: 100%;
+  min-width: 0;
   min-height: 46px;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -794,14 +791,23 @@ textarea:focus {
   font-weight: 850;
 }
 
+.theme-toggle span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .accent-selector {
+  width: 100%;
+  min-width: 0;
   min-height: 46px;
   border: 1px solid var(--border);
   border-radius: 8px;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 0 9px;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 0 8px;
   background: var(--surface);
   color: var(--text);
   font-weight: 850;
@@ -814,9 +820,10 @@ textarea:focus {
 
 .accent-selector select {
   width: auto;
+  min-width: 54px;
   min-height: 34px;
   border: 0;
-  padding: 0 20px 0 4px;
+  padding: 0 18px 0 4px;
   background: transparent;
   color: var(--text);
   font-weight: 900;
@@ -977,5 +984,25 @@ button:disabled {
 
   .modal-backdrop {
     align-items: center;
+  }
+}
+
+@media (min-width: 900px) {
+  .topbar {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .topbar-actions {
+    width: auto;
+    grid-template-columns: auto auto 46px 46px;
+  }
+
+  .accent-selector {
+    min-width: 128px;
+  }
+
+  .theme-toggle {
+    min-width: 112px;
   }
 }
