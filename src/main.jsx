@@ -556,7 +556,7 @@ function App() {
         <div className="brand-heading">
           <div className="brand-row">
             <div>
-              <p className="brand-name"><span>K</span>alemati</p>
+              <BrandRefreshButton />
             </div>
           </div>
           <h1>{pageTitle(activePage)}</h1>
@@ -616,7 +616,7 @@ function AppFrame({ children, theme, setTheme }) {
         <div className="brand-heading">
           <div className="brand-row">
             <div>
-              <p className="brand-name"><span>K</span>alemati</p>
+              <BrandRefreshButton />
             </div>
           </div>
         </div>
@@ -627,6 +627,20 @@ function AppFrame({ children, theme, setTheme }) {
       </header>
       <main>{children}</main>
     </div>
+  );
+}
+
+function BrandRefreshButton() {
+  return (
+    <button
+      className="brand-name brand-refresh-button"
+      type="button"
+      title="Refresh page"
+      aria-label="Refresh Kalemati"
+      onClick={() => window.location.reload()}
+    >
+      <span>K</span>alemati
+    </button>
   );
 }
 

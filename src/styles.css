@@ -136,6 +136,21 @@ select {
   line-height: 1;
 }
 
+.brand-refresh-button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.brand-refresh-button:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 5px;
+  border-radius: 8px;
+}
+
 .brand-name span {
   color: var(--primary);
 }
