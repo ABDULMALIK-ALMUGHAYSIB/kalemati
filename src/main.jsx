@@ -1607,7 +1607,6 @@ function EditModal({ entry, onSave, onCancel, onDelete }) {
 function Navigation({ activePage, onNavigate }) {
   const items = [
     { id: "dashboard", label: "Home", icon: Home },
-    { id: "add", label: "Add", icon: Plus },
     { id: "list", label: "Words", icon: Library },
     { id: "review", label: "Review", icon: BookOpen },
     { id: "quiz", label: "Quiz", icon: Brain },
