@@ -1082,9 +1082,26 @@ function WordCard({ accent, entry, onEdit }) {
         </div>
       </div>
 
-      {entry.example ? <p className="example">"{entry.example}"</p> : null}
-      {entry.meaning ? <p>{entry.meaning}</p> : null}
-      {entry.usage ? <p className="muted">{entry.usage}</p> : null}
+      <div className="word-detail-list">
+        {entry.example ? (
+          <div className="word-detail">
+            <span>Example</span>
+            <p className="example">"{entry.example}"</p>
+          </div>
+        ) : null}
+        {entry.meaning ? (
+          <div className="word-detail">
+            <span>Meaning</span>
+            <p>{entry.meaning}</p>
+          </div>
+        ) : null}
+        {entry.usage ? (
+          <div className="word-detail">
+            <span>Use</span>
+            <p className="muted">{entry.usage}</p>
+          </div>
+        ) : null}
+      </div>
 
       <div className="card-meta">
         <span>{entry.category}</span>
