@@ -788,9 +788,11 @@ function Dashboard({ entries, onNavigate }) {
           <span>Added today</span>
           <strong>{stats.addedToday}</strong>
         </div>
-        <button type="button" onClick={() => onNavigate("add")}>
-          <Plus size={18} />
-          Add
+        <button className="home-add-button" type="button" onClick={() => onNavigate("add")}>
+          <span className="home-add-icon">
+            <Plus size={18} />
+          </span>
+          <span>Add word</span>
         </button>
       </article>
 
