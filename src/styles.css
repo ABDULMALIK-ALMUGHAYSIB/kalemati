@@ -200,7 +200,7 @@ main {
 }
 
 .stat-card span,
-.today-panel span,
+.today-panel > div > span,
 .score-bar span,
 .quiz-card span,
 .review-card > span,
@@ -252,7 +252,8 @@ main {
   border-radius: 8px;
   display: grid;
   place-items: center;
-  background: color-mix(in srgb, var(--primary-text) 18%, transparent);
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
 }
 
 .today-panel button,
@@ -285,7 +286,14 @@ main {
   padding: 0 14px 0 10px;
   border: 1px solid color-mix(in srgb, var(--primary) 26%, var(--border));
   box-shadow: inset 0 1px 0 color-mix(in srgb, #ffffff 28%, transparent);
+  color: #ffffff;
   white-space: nowrap;
+}
+
+.today-panel .home-add-button span:last-child {
+  color: #ffffff;
+  font-size: 0.98rem;
+  font-weight: 900;
 }
 
 .action-grid {
