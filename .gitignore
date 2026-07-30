@@ -3,3 +3,4 @@ dist/
 vite.log
 vite.err.log
 .env
+.claude/
