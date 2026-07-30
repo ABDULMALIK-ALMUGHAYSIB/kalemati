@@ -1,6 +1,26 @@
-import { Edit3 } from "lucide-react";
+import { useState } from "react";
+import { ChevronDown, ChevronUp, Edit3 } from "lucide-react";
 import { formatDate } from "../utils/helpers";
 import { SpeakerButton } from "./SpeakerButton";
+
+function ExpandableDetail({ label, text }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <button
+      type="button"
+      className={`word-detail detail-toggle${expanded ? " expanded" : ""}`}
+      onClick={() => setExpanded((value) => !value)}
+      aria-expanded={expanded}
+    >
+      <div className="detail-toggle-label">
+        <span>{label}</span>
+        {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+      </div>
+      {expanded ? <p className="muted">{text}</p> : null}
+    </button>
+  );
+}
 
 export function WordCard({ accent, entry, onEdit }) {
   return (
@@ -22,18 +42,8 @@ export function WordCard({ accent, entry, onEdit }) {
             <p className="example">"{entry.example}"</p>
           </div>
         ) : null}
-        {entry.meaning ? (
-          <div className="word-detail">
-            <span>Meaning</span>
-            <p>{entry.meaning}</p>
-          </div>
-        ) : null}
-        {entry.usage ? (
-          <div className="word-detail">
-            <span>Use</span>
-            <p className="muted">{entry.usage}</p>
-          </div>
-        ) : null}
+        {entry.meaning ? <ExpandableDetail label="Meaning" text={entry.meaning} /> : null}
+        {entry.usage ? <ExpandableDetail label="Use" text={entry.usage} /> : null}
       </div>
 
       <div className="card-meta">
