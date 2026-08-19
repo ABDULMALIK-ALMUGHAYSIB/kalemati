@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LoaderCircle, Save, Sparkles } from "lucide-react";
+import { Eraser, LoaderCircle, Save, Sparkles } from "lucide-react";
 import { CATEGORIES, STATUSES, emptyForm } from "../constants";
 import { Field, TextArea, TextInput } from "../components/FormFields";
 import { SegmentedControl } from "../components/SegmentedControl";
@@ -8,6 +8,7 @@ import { containsArabic } from "../utils/helpers";
 
 export function AddWordPage({ accent, onSave }) {
   const [mode, setMode] = useState("AI Assist");
+  const [translateMode, setTranslateMode] = useState("Literal");
   const [form, setForm] = useState(emptyForm);
   const [generated, setGenerated] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
@@ -17,6 +18,18 @@ export function AddWordPage({ accent, onSave }) {
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
+  }
+
+  function handleClear() {
+    setForm(emptyForm);
+    setGenerated(false);
+    setAiError("");
+    setSaveError("");
+  }
+
+  function handleTranslateModeChange(nextTranslateMode) {
+    setTranslateMode(nextTranslateMode);
+    handleClear();
   }
 
   async function handleAiGenerate() {
@@ -37,7 +50,10 @@ export function AddWordPage({ accent, onSave }) {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ word })
+        body: JSON.stringify({
+          word,
+          mode: translateMode === "Literal" ? "literal" : "infer"
+        })
       });
 
       const data = await response.json().catch(() => ({
@@ -111,15 +127,28 @@ export function AddWordPage({ accent, onSave }) {
         </Field>
 
         {mode === "AI Assist" ? (
-          <button
-            className="secondary-button"
-            type="button"
-            onClick={handleAiGenerate}
-            disabled={aiLoading}
-          >
-            {aiLoading ? <LoaderCircle className="spin" size={18} /> : <Sparkles size={18} />}
-            {aiLoading ? "Generating..." : "Generate with AI"}
-          </button>
+          <>
+            <SegmentedControl
+              label="Translate mode"
+              options={["Auto", "Literal"]}
+              value={translateMode}
+              onChange={handleTranslateModeChange}
+            />
+            <p className="inline-note">
+              {translateMode === "Literal"
+                ? "Translates exactly what you typed, even if it looks like a question."
+                : "If you type a question or description, AI infers the word it's asking about."}
+            </p>
+            <button
+              className="secondary-button"
+              type="button"
+              onClick={handleAiGenerate}
+              disabled={aiLoading}
+            >
+              {aiLoading ? <LoaderCircle className="spin" size={18} /> : <Sparkles size={18} />}
+              {aiLoading ? "Generating..." : "Generate with AI"}
+            </button>
+          </>
         ) : null}
 
         {mode === "AI Assist" && generated ? (
@@ -191,10 +220,21 @@ export function AddWordPage({ accent, onSave }) {
 
         {saveError ? <p className="error-note" role="alert">{saveError}</p> : null}
 
-        <button className="primary-button" type="submit" disabled={saveLoading}>
-          {saveLoading ? <LoaderCircle className="spin" size={18} /> : <Save size={18} />}
-          {saveLoading ? "Saving..." : "Save Word"}
-        </button>
+        <div className="two-column">
+          <button
+            className="secondary-button"
+            type="button"
+            onClick={handleClear}
+            disabled={saveLoading}
+          >
+            <Eraser size={18} />
+            Clear
+          </button>
+          <button className="primary-button" type="submit" disabled={saveLoading}>
+            {saveLoading ? <LoaderCircle className="spin" size={18} /> : <Save size={18} />}
+            {saveLoading ? "Saving..." : "Save Word"}
+          </button>
+        </div>
       </form>
     </section>
   );

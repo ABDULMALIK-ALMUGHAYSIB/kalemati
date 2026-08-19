@@ -23,22 +23,49 @@ const responseSchema = {
   ]
 };
 
-const systemPrompt = `You are an English vocabulary assistant for an Arabic speaker.
-Given one English or Arabic word/phrase, generate a vocabulary card with:
-1. English word or phrase
-2. Arabic translation
-3. Simple English meaning
-4. Natural example sentence in English
-5. When to use it
-6. Suggested category from: Work, Daily, Email, Interview, Grammar, Other
+const literalSystemPrompt = `You are an English vocabulary assistant for an Arabic speaker building a personal vocabulary card.
+
+The input is the exact word or phrase to translate literally to English (or keep as-is if already English) — even if it is a full question or sentence, translate it exactly. Do not shorten it, answer a different question, or replace it with something else.
+
+Generate a vocabulary card with:
+- English word or phrase (the literal translation)
+- Arabic translation
+- Simple English meaning
+- Natural example sentence in English
+- When to use it
+- Suggested category from: Work, Daily, Email, Interview, Grammar, Other
 
 Rules:
-- If the input is Arabic, translate it to the most natural English word or phrase.
-- If the input is English, keep the English word or phrase natural and clean.
-- Always fill englishWordOrPhrase with English text only.
 - Always fill arabicTranslation with Arabic text only.
 - Keep the meaning simple and beginner-friendly.
 - Make the example practical.
+- If the input is about English rules, sentence structure, or grammar words, choose Grammar.
+- If the word is useful for workplace or interviews, choose Work or Interview.
+- Return JSON only.`;
+
+const inferSystemPrompt = `You are an English vocabulary assistant for an Arabic speaker building a personal vocabulary card.
+
+The input may be:
+1. A direct word or phrase (English or Arabic) they want translated and explained.
+2. A description or question (English or Arabic) asking what word or phrase fits a situation or feeling — for example "وش الكلمة اللي اقولها اذا انا احب واحد" or "what do you call someone who never gives up".
+
+Decide which kind of input this is:
+- If it's direct, use it as-is (translate Arabic to English first if needed).
+- If it's a description or question, infer the single best English word or phrase that answers it, and treat that as the word.
+
+Generate a vocabulary card with:
+- English word or phrase
+- Arabic translation
+- Simple English meaning
+- Natural example sentence in English
+- When to use it
+- Suggested category from: Work, Daily, Email, Interview, Grammar, Other
+
+Rules:
+- englishWordOrPhrase must be a short, natural English word or phrase — never a full sentence restating the user's question.
+- Always fill arabicTranslation with Arabic text only.
+- Keep the meaning simple and beginner-friendly.
+- Make the example practical and, when the input was a description, reflect that situation naturally.
 - If the input is about English rules, sentence structure, or grammar words, choose Grammar.
 - If the word is useful for workplace or interviews, choose Work or Interview.
 - Return JSON only.`;
@@ -61,6 +88,7 @@ export default async function handler(req, res) {
 
   const word = typeof req.body?.word === "string" ? req.body.word.trim() : "";
   const inputLanguage = /[\u0600-\u06FF]/.test(word) ? "Arabic" : "English";
+  const mode = req.body?.mode === "literal" ? "literal" : "infer";
 
   if (!word) {
     return res.status(400).json({ error: "Word is required." });
@@ -78,7 +106,7 @@ export default async function handler(req, res) {
       model: "gpt-4o-mini",
       temperature: 0.3,
       messages: [
-        { role: "system", content: systemPrompt },
+        { role: "system", content: mode === "literal" ? literalSystemPrompt : inferSystemPrompt },
         {
           role: "user",
           content: `Input language: ${inputLanguage}\nInput word or phrase: ${word}`

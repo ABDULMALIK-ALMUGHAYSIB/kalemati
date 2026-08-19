@@ -46,7 +46,6 @@ export function App() {
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
-    document.querySelector("link[rel='icon']")?.setAttribute("href", LOGOS[theme]);
     document.querySelector("link[rel='apple-touch-icon']")?.setAttribute("href", LOGOS[theme]);
     saveTheme(theme);
   }, [theme]);
