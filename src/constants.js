@@ -8,8 +8,8 @@ export const ACCENTS = [
   { value: "en-GB", label: "UK" }
 ];
 export const LOGOS = {
-  dark: "/kalemati-logo-dark.png",
-  light: "/kalemati-logo-light.png"
+  dark: "/kalemati-logo-dark.png?v=2",
+  light: "/kalemati-logo-light.png?v=2"
 };
 export const emptyForm = {
   english: "",
