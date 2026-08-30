@@ -1,4 +1,4 @@
-import { ACCENTS, ACCENT_KEY, THEME_KEY } from "../constants";
+import { ACCENTS, ACCENT_KEY, STORY_CACHE_PREFIX, THEME_KEY } from "../constants";
 
 export function todayKey(date = new Date()) {
   return date.toISOString().slice(0, 10);
@@ -50,13 +50,29 @@ export function normalizeArabic(value) {
   return value.trim().replace(/\s+/g, "").toLowerCase();
 }
 
+export function loadCachedStory(batchKey) {
+  try {
+    const raw = localStorage.getItem(STORY_CACHE_PREFIX + batchKey);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function saveCachedStory(batchKey, story) {
+  try {
+    localStorage.setItem(STORY_CACHE_PREFIX + batchKey, JSON.stringify(story));
+  } catch {
+    // Ignore storage errors (e.g. private browsing, quota).
+  }
+}
+
 export function pageTitle(page) {
   return {
     dashboard: "Dashboard",
     add: "Add Word",
     list: "Vocabulary",
-    review: "Review Today",
-    quiz: "Quiz",
+    review: "Stories",
     lessons: "Lessons"
   }[page];
 }

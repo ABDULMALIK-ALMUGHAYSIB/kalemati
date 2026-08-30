@@ -1,7 +1,8 @@
 import { useMemo } from "react";
-import { BookOpen, Brain, Plus } from "lucide-react";
+import { BookOpen, Plus } from "lucide-react";
 import { StatCard } from "../components/StatCard";
 import { todayKey } from "../utils/helpers";
+import { isDue } from "../utils/srs";
 
 export function Dashboard({ entries, onNavigate }) {
   const stats = useMemo(() => {
@@ -11,7 +12,8 @@ export function Dashboard({ entries, onNavigate }) {
       newWords: entries.filter((entry) => entry.status === "New").length,
       learning: entries.filter((entry) => entry.status === "Learning").length,
       mastered: entries.filter((entry) => entry.status === "Mastered").length,
-      addedToday: entries.filter((entry) => todayKey(new Date(entry.dateAdded)) === today).length
+      addedToday: entries.filter((entry) => todayKey(new Date(entry.dateAdded)) === today).length,
+      dueToday: entries.filter((entry) => isDue(entry)).length
     };
   }, [entries]);
 
@@ -37,16 +39,10 @@ export function Dashboard({ entries, onNavigate }) {
         </button>
       </article>
 
-      <div className="action-grid">
-        <button type="button" onClick={() => onNavigate("review")}>
-          <BookOpen size={20} />
-          Review
-        </button>
-        <button type="button" onClick={() => onNavigate("quiz")}>
-          <Brain size={20} />
-          Quiz
-        </button>
-      </div>
+      <button className="primary-button review-cta" type="button" onClick={() => onNavigate("review")}>
+        <BookOpen size={20} />
+        {stats.dueToday ? `Stories (${stats.dueToday} due)` : "Stories"}
+      </button>
     </section>
   );
 }

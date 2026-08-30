@@ -12,7 +12,10 @@ function fromRow(row) {
     usage: row.when_to_use || "",
     category: row.category,
     status: row.status,
-    dateAdded: row.date_added
+    dateAdded: row.date_added,
+    reviewLevel: row.review_level ?? 0,
+    nextReviewAt: row.next_review_at || row.date_added,
+    lastReviewedAt: row.last_reviewed_at || null
   };
 }
 
@@ -42,6 +45,9 @@ function toPatch(patch) {
   if ("category" in patch) row.category = patch.category;
   if ("status" in patch) row.status = patch.status;
   if ("dateAdded" in patch) row.date_added = patch.dateAdded;
+  if ("reviewLevel" in patch) row.review_level = patch.reviewLevel;
+  if ("nextReviewAt" in patch) row.next_review_at = patch.nextReviewAt;
+  if ("lastReviewedAt" in patch) row.last_reviewed_at = patch.lastReviewedAt;
 
   return row;
 }

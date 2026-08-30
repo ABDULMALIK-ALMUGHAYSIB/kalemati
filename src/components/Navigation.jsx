@@ -1,11 +1,10 @@
-import { BookOpen, Brain, ClipboardList, Home, Library } from "lucide-react";
+import { BookOpen, ClipboardList, Home, Library } from "lucide-react";
 
 export function Navigation({ activePage, onNavigate }) {
   const items = [
     { id: "dashboard", label: "Home", icon: Home },
     { id: "list", label: "Words", icon: Library },
-    { id: "review", label: "Review", icon: BookOpen },
-    { id: "quiz", label: "Quiz", icon: Brain },
+    { id: "review", label: "Stories", icon: BookOpen },
     { id: "lessons", label: "Lessons", icon: ClipboardList }
   ];
 

@@ -28,8 +28,7 @@ import { AddWordPage } from "./pages/AddWordPage";
 import { AuthPage } from "./pages/AuthPage";
 import { Dashboard } from "./pages/Dashboard";
 import { LessonsPage } from "./pages/LessonsPage";
-import { QuizPage } from "./pages/QuizPage";
-import { ReviewToday } from "./pages/ReviewToday";
+import { StoriesPage } from "./pages/StoriesPage";
 import { VocabularyList } from "./pages/VocabularyList";
 
 export function App() {
@@ -69,13 +68,16 @@ export function App() {
       setAuthLoading(false);
     });
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, nextSession) => {
       setSession(nextSession);
-      setEntries([]);
-      setEditingEntry(null);
-      setActivePage("dashboard");
-      setSyncError("");
-      setSyncNotice("");
+
+      if (event === "SIGNED_OUT") {
+        setEntries([]);
+        setEditingEntry(null);
+        setActivePage("dashboard");
+        setSyncError("");
+        setSyncNotice("");
+      }
     });
 
     return () => {
@@ -236,14 +238,7 @@ export function App() {
         onEdit={setEditingEntry}
       />
     ),
-    review: (
-      <ReviewToday
-        accent={accent}
-        entries={entries}
-        onUpdate={updateEntry}
-      />
-    ),
-    quiz: <QuizPage accent={accent} entries={entries} />,
+    review: <StoriesPage accent={accent} entries={entries} />,
     lessons: <LessonsPage />
   };
 
