@@ -84,7 +84,12 @@ export function AddWordPage({ accent, onSave }) {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    if (!form.english.trim() || !form.arabic.trim()) return;
+
+    if (!form.english.trim() || !form.arabic.trim()) {
+      setSaveError("Add both the English word and its Arabic translation before saving.");
+      return;
+    }
+
     setSaveLoading(true);
     setSaveError("");
 
