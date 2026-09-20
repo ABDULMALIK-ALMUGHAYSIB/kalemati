@@ -238,7 +238,7 @@ export function App() {
         onEdit={setEditingEntry}
       />
     ),
-    review: <StoriesPage accent={accent} entries={entries} />,
+    review: <StoriesPage accent={accent} entries={entries} userId={session?.user?.id} />,
     lessons: <LessonsPage />
   };
 

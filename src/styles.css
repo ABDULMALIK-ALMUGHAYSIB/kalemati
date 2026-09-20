@@ -785,6 +785,16 @@ textarea:focus {
   font-weight: 800;
 }
 
+.story-batch-card:disabled {
+  opacity: 0.6;
+}
+
+.story-read-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .story-back-button {
   width: fit-content;
 }

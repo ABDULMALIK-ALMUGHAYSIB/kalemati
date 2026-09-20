@@ -1,13 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, BookOpen } from "lucide-react";
+import { ArrowLeft, BookOpen, Check, Sparkles } from "lucide-react";
 import { EmptyState } from "../components/EmptyState";
 import { LoadingState } from "../components/LoadingState";
 import { SpeakerButton } from "../components/SpeakerButton";
-import { STORY_BATCHES } from "../data/storyBatches";
-import { loadCachedStory, saveCachedStory } from "../utils/helpers";
+import { createStory, fetchStories, markStoryRead } from "../storyRepository";
 
-function normalizeKey(value) {
-  return value.trim().toLowerCase();
+const BATCH_SIZE = 10;
+
+function sortByDateAddedAsc(entries) {
+  return [...entries].sort((a, b) => new Date(a.dateAdded) - new Date(b.dateAdded));
+}
+
+function chunkIntoBatches(entries, size) {
+  const batches = [];
+  for (let i = 0; i < entries.length; i += size) {
+    batches.push(entries.slice(i, i + size));
+  }
+  return batches;
 }
 
 function normalizeWord(value) {
@@ -33,7 +42,7 @@ function matchesTargetWord(boldText, target) {
   });
 }
 
-function StoryText({ story, batch, accent }) {
+function StoryText({ story, words, accent }) {
   const [openIndex, setOpenIndex] = useState(null);
   const parts = useMemo(() => story.split(/\*\*(.+?)\*\*/g), [story]);
 
@@ -42,10 +51,10 @@ function StoryText({ story, batch, accent }) {
       {parts.map((part, index) => {
         // Only highlight words that are actually in the batch — the model
         // occasionally bolds extra words that were never in the target list.
-        const matchedEntry =
-          index % 2 === 1 ? batch.find((entry) => matchesTargetWord(part, entry.english)) : null;
+        const matchedWord =
+          index % 2 === 1 ? words.find((word) => matchesTargetWord(part, word.english)) : null;
 
-        if (!matchedEntry) {
+        if (!matchedWord) {
           return <span key={index}>{part}</span>;
         }
 
@@ -61,8 +70,8 @@ function StoryText({ story, batch, accent }) {
             </button>
             {isOpen ? (
               <span className="story-highlight-card">
-                <span dir="rtl" lang="ar">{matchedEntry.arabic}</span>
-                <SpeakerButton text={matchedEntry.english} accent={accent} />
+                <span dir="rtl" lang="ar">{matchedWord.arabic}</span>
+                <SpeakerButton text={matchedWord.english} accent={accent} />
               </span>
             ) : null}
           </span>
@@ -72,17 +81,88 @@ function StoryText({ story, batch, accent }) {
   );
 }
 
-export function StoriesPage({ accent, entries }) {
+export function StoriesPage({ accent, entries, userId }) {
   const entryIdsKey = useMemo(() => entries.map((entry) => entry.id).sort().join("|"), [entries]);
-  const batches = useMemo(() => {
-    const byKey = new Map(entries.map((entry) => [normalizeKey(entry.english), entry]));
-    return STORY_BATCHES.map((batch) => ({
-      title: batch.title,
-      entries: batch.words.map((word) => byKey.get(normalizeKey(word))).filter(Boolean)
-    })).filter((batch) => batch.entries.length > 0);
+  const batches = useMemo(
+    () => chunkIntoBatches(sortByDateAddedAsc(entries), BATCH_SIZE).filter((batch) => batch.length === BATCH_SIZE),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entryIdsKey]);
+    [entryIdsKey]
+  );
+  const remainder = entries.length % BATCH_SIZE;
+
+  const [stories, setStories] = useState([]);
+  const [storiesLoading, setStoriesLoading] = useState(true);
+  const [storiesError, setStoriesError] = useState("");
   const [selectedBatch, setSelectedBatch] = useState(null);
+  const [creatingIndex, setCreatingIndex] = useState(null);
+  const [createError, setCreateError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    setStoriesLoading(true);
+
+    fetchStories()
+      .then((data) => {
+        if (!cancelled) setStories(data);
+      })
+      .catch((error) => {
+        if (!cancelled) setStoriesError(error.message || "Could not load your stories.");
+      })
+      .finally(() => {
+        if (!cancelled) setStoriesLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const storyByBatch = useMemo(() => new Map(stories.map((story) => [story.batchIndex, story])), [stories]);
+
+  async function handleCreateStory(batchIndex, batch) {
+    if (creatingIndex !== null) return;
+    setCreatingIndex(batchIndex);
+    setCreateError("");
+
+    try {
+      const response = await fetch("/api/generate-story", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          words: batch.map((entry) => ({ english: entry.english, arabic: entry.arabic }))
+        })
+      });
+
+      const data = await response.json().catch(() => ({
+        error: "Story endpoint is not returning JSON. Check the deployment API route."
+      }));
+      if (!response.ok) throw new Error(data.error || "Could not generate a story.");
+
+      const saved = await createStory({
+        userId,
+        batchIndex,
+        words: batch.map((entry) => ({ id: entry.id, english: entry.english, arabic: entry.arabic })),
+        story: data.story,
+        storyArabic: data.storyArabic
+      });
+
+      setStories((current) => [...current, saved]);
+      setSelectedBatch(batchIndex);
+    } catch (error) {
+      setCreateError(error.message || "Could not create the story.");
+    } finally {
+      setCreatingIndex(null);
+    }
+  }
+
+  async function handleMarkRead(story) {
+    try {
+      const updated = await markStoryRead(story.id);
+      setStories((current) => current.map((item) => (item.id === updated.id ? updated : item)));
+    } catch {
+      // Not critical — the read flag is just a personal tracker.
+    }
+  }
 
   if (!entries.length) {
     return (
@@ -94,91 +174,71 @@ export function StoriesPage({ accent, entries }) {
     );
   }
 
-  if (selectedBatch === null) {
+  if (storiesLoading) {
+    return <LoadingState text="Loading your stories..." />;
+  }
+
+  if (selectedBatch !== null) {
+    const story = storyByBatch.get(selectedBatch);
     return (
-      <section className="page-stack">
-        <div className="story-batch-grid">
-          {batches.map((batch, index) => (
-            <button
-              key={batch.title}
-              type="button"
-              className="story-batch-card"
-              onClick={() => setSelectedBatch(index)}
-            >
-              <BookOpen size={20} />
-              <span>
-                {batch.title}
-                <small>{batch.entries.length} words</small>
-              </span>
-            </button>
-          ))}
-        </div>
-      </section>
+      <StoryDetail
+        accent={accent}
+        batchIndex={selectedBatch}
+        story={story}
+        onMarkRead={() => handleMarkRead(story)}
+        onBack={() => setSelectedBatch(null)}
+      />
     );
   }
 
   return (
-    <StoryDetail
-      accent={accent}
-      title={batches[selectedBatch].title}
-      batch={batches[selectedBatch].entries}
-      onBack={() => setSelectedBatch(null)}
-    />
+    <section className="page-stack">
+      {storiesError ? <p className="error-note" role="alert">{storiesError}</p> : null}
+      {createError ? <p className="error-note" role="alert">{createError}</p> : null}
+
+      <div className="story-batch-grid">
+        {batches.map((batch, index) => {
+          const story = storyByBatch.get(index);
+          const isCreating = creatingIndex === index;
+
+          return (
+            <button
+              key={index}
+              type="button"
+              className="story-batch-card"
+              disabled={isCreating}
+              onClick={() => (story ? setSelectedBatch(index) : handleCreateStory(index, batch))}
+            >
+              {story ? <BookOpen size={20} /> : <Sparkles size={20} />}
+              <span>
+                Words {index * BATCH_SIZE + 1}–{index * BATCH_SIZE + BATCH_SIZE}
+                <small>
+                  {isCreating
+                    ? "Creating story…"
+                    : story
+                    ? story.isRead
+                      ? "Read"
+                      : "Ready to read"
+                    : "Tap to create a story"}
+                </small>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {remainder > 0 ? (
+        <p className="inline-note">
+          {remainder} of {BATCH_SIZE} words saved toward your next story.
+        </p>
+      ) : null}
+    </section>
   );
 }
 
-function StoryDetail({ accent, title, batch, onBack }) {
-  const batchKey = useMemo(() => batch.map((entry) => entry.id).join("|"), [batch]);
-  const [story, setStory] = useState(null);
-  const [storyLoading, setStoryLoading] = useState(false);
-  const [storyError, setStoryError] = useState("");
+function StoryDetail({ accent, batchIndex, story, onMarkRead, onBack }) {
   const [showTranslation, setShowTranslation] = useState(false);
   const [showWordList, setShowWordList] = useState(false);
-
-  useEffect(() => {
-    setShowTranslation(false);
-    setShowWordList(false);
-
-    const cached = loadCachedStory(batchKey);
-    if (cached) {
-      setStory(cached);
-      setStoryError("");
-      return undefined;
-    }
-
-    let cancelled = false;
-    setStory(null);
-    setStoryLoading(true);
-    setStoryError("");
-
-    fetch("/api/generate-story", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        words: batch.map((entry) => ({ english: entry.english, arabic: entry.arabic }))
-      })
-    })
-      .then(async (response) => {
-        const data = await response.json().catch(() => ({
-          error: "Story endpoint is not returning JSON. Check the deployment API route."
-        }));
-        if (!response.ok) throw new Error(data.error || "Could not generate a story.");
-        if (!cancelled) {
-          setStory(data);
-          saveCachedStory(batchKey, data);
-        }
-      })
-      .catch((error) => {
-        if (!cancelled) setStoryError(error.message || "Could not generate a story.");
-      })
-      .finally(() => {
-        if (!cancelled) setStoryLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [batchKey]);
 
   return (
     <section className="page-stack">
@@ -187,54 +247,57 @@ function StoryDetail({ accent, title, batch, onBack }) {
         Back to stories
       </button>
 
-      <h2 className="story-batch-title">{title}</h2>
+      <h2 className="story-batch-title">Story {batchIndex + 1}</h2>
 
       <article className="story-card">
-        {storyLoading ? <LoadingState text="Writing your story..." /> : null}
-        {storyError ? <p className="error-note" role="alert">{storyError}</p> : null}
-        {story ? (
-          <>
-            <StoryText story={story.story} batch={batch} accent={accent} />
-            <button
-              type="button"
-              className="secondary-button story-translate-button"
-              onClick={() => setShowTranslation((value) => !value)}
-            >
-              {showTranslation ? "Hide translation" : "Translate story"}
-            </button>
-            {showTranslation ? (
-              <p className="story-text story-text-arabic" dir="rtl" lang="ar">
-                {story.storyArabic}
-              </p>
-            ) : null}
-          </>
+        <StoryText story={story.story} words={story.words} accent={accent} />
+        <button
+          type="button"
+          className="secondary-button story-translate-button"
+          onClick={() => setShowTranslation((value) => !value)}
+        >
+          {showTranslation ? "Hide translation" : "Translate story"}
+        </button>
+        {showTranslation ? (
+          <p className="story-text story-text-arabic" dir="rtl" lang="ar">
+            {story.storyArabic}
+          </p>
         ) : null}
       </article>
 
-      {story ? (
-        <>
-          <button
-            type="button"
-            className="secondary-button story-translate-button"
-            onClick={() => setShowWordList((value) => !value)}
-          >
-            {showWordList ? "Hide word list" : "Show word list"}
-          </button>
-          {showWordList ? (
-            <div className="story-word-list">
-              {batch.map((entry) => (
-                <article key={entry.id} className="story-word-row">
-                  <div className="center-title-row">
-                    <strong>{entry.english}</strong>
-                    <SpeakerButton text={entry.english} accent={accent} />
-                  </div>
-                  <p dir="rtl" lang="ar">{entry.arabic}</p>
-                </article>
-              ))}
-            </div>
-          ) : null}
-        </>
+      <button
+        type="button"
+        className="secondary-button story-translate-button"
+        onClick={() => setShowWordList((value) => !value)}
+      >
+        {showWordList ? "Hide word list" : "Show word list"}
+      </button>
+
+      {showWordList ? (
+        <div className="story-word-list">
+          {story.words.map((word) => (
+            <article key={word.id || word.english} className="story-word-row">
+              <div className="center-title-row">
+                <strong>{word.english}</strong>
+                <SpeakerButton text={word.english} accent={accent} />
+              </div>
+              <p dir="rtl" lang="ar">{word.arabic}</p>
+            </article>
+          ))}
+        </div>
       ) : null}
+
+      {story.isRead ? (
+        <p className="inline-note story-read-note">
+          <Check size={16} />
+          You've marked this story as read.
+        </p>
+      ) : (
+        <button type="button" className="primary-button" onClick={onMarkRead}>
+          <Check size={18} />
+          Mark as read
+        </button>
+      )}
     </section>
   );
 }
