@@ -88,7 +88,7 @@ select {
   width: min(100%, 860px);
   min-height: 100vh;
   margin: 0 auto;
-  padding: 12px 14px 96px;
+  padding: 12px 14px calc(96px + env(safe-area-inset-bottom));
 }
 
 .topbar {
@@ -1319,7 +1319,7 @@ button:disabled {
 
 @media (min-width: 680px) {
   .app-shell {
-    padding: 22px 22px 110px;
+    padding: 22px 22px calc(110px + env(safe-area-inset-bottom));
   }
 
   .stats-grid {
