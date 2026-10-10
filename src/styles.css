@@ -774,6 +774,19 @@ textarea:focus {
   flex-shrink: 0;
 }
 
+.story-batch-card.read {
+  border-color: color-mix(in srgb, #22c55e 45%, var(--border));
+  background: color-mix(in srgb, #22c55e 10%, var(--surface));
+}
+
+.story-batch-card.read svg {
+  color: #16a34a;
+}
+
+.story-batch-card.read small {
+  color: #16a34a;
+}
+
 .story-batch-card span {
   display: grid;
   gap: 2px;

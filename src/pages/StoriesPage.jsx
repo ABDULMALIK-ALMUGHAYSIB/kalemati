@@ -205,7 +205,7 @@ export function StoriesPage({ accent, entries, userId }) {
             <button
               key={index}
               type="button"
-              className="story-batch-card"
+              className={`story-batch-card${story?.isRead ? " read" : ""}`}
               disabled={isCreating}
               onClick={() => (story ? setSelectedBatch(index) : handleCreateStory(index, batch))}
             >
